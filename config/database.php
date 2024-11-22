@@ -1,6 +1,6 @@
 <?php
 $host = '10.128.0.3';
-$usuario = 'root';
+$usuario = 'apcr';
 $password = 'root'; 
 $base_datos = 'proyecto_mvc';
 $puerto = 3306; 
