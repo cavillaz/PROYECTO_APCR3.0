@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
 $usuario = 'root';
-$password = ''; 
-$base_datos = 'base_apcr';
+$password = 'root'; 
+$base_datos = 'proyecto_mvc';
 $puerto = 3306; 
 
 $conn = new mysqli($host, $usuario, $password, $base_datos, $puerto);
