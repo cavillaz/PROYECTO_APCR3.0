@@ -1,5 +1,5 @@
 <?php
-$host = 'localhost';
+$host = '10.128.0.3';
 $usuario = 'root';
 $password = 'root'; 
 $base_datos = 'proyecto_mvc';
