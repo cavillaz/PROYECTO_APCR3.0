@@ -1,8 +1,11 @@
 <?php
-// Iniciar la sesión si no está ya iniciada
+// Solo iniciar la sesión si no hay ninguna activa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+require_once __DIR__ . '/../partials/auth.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -49,10 +52,10 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <td><?= ucfirst(htmlspecialchars($solicitud['estado'])); ?></td>
                                 <td>
                                     <button class="btn btn-success btn-sm" onclick="aprobarSolicitud(<?= $solicitud['id']; ?>)">
-                                        <i class="fas fa-check-circle"></i> Aprobar
+                                        <i class="fas fa-check-circle"></i>
                                     </button>
                                     <button class="btn btn-danger btn-sm" onclick="rechazarSolicitud(<?= $solicitud['id']; ?>)">
-                                        <i class="fas fa-times-circle"></i> Rechazar
+                                        <i class="fas fa-times-circle"></i>
                                     </button>
                                 </td>
                             </tr>

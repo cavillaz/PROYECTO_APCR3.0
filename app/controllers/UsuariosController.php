@@ -1,6 +1,7 @@
 <?php
 class UsuariosController {
 
+
     // Función de registro (ya existente)
     public function registro() {
         require_once __DIR__ . '/../../config/database.php';
@@ -12,6 +13,7 @@ class UsuariosController {
         require_once __DIR__ . '/../views/usuarios/registro.php';
     }
 
+    
     public function registrarUsuario() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             require_once __DIR__ . '/../../config/database.php';
@@ -85,7 +87,9 @@ class UsuariosController {
     
                 // Verificar la contraseña
                 if (password_verify($clave, $usuario['clave'])) {
-                    session_start();
+                    if (session_status() === PHP_SESSION_NONE) {
+                        session_start();
+                    }
                     
                     // Configurar la sesión con los datos del usuario
                     $_SESSION['usuario'] = $usuario['nombre_completo'];
@@ -109,7 +113,9 @@ class UsuariosController {
 
     // Función para la página principal del usuario (nueva)
     public function principal() {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         if (!isset($_SESSION['usuario'])) {
             header("Location: /PROYECTO_APCR3.0/usuarios/login");
             exit();
@@ -144,9 +150,12 @@ class UsuariosController {
     }
 
     public function mostrarUsuarios() {
-        session_start();
-        if (!isset($_SESSION['usuario']) || $_SESSION['rol'] != 'administrador') {
-            header("Location: /PROYECTO_APCR3.0/usuarios/login");
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (!isset($_SESSION['usuario']) || ($_SESSION['rol'] !== 'administrador' && $_SESSION['rol'] !== 'porteria')) {
+            // Redirigir a la página principal si no tiene permisos
+            header("Location: /PROYECTO_APCR3.0/usuarios/principal?mensaje=No%20tienes%20permiso%20para%20acceder%20a%20esta%20sección.");
             exit();
         }
     
@@ -160,30 +169,16 @@ class UsuariosController {
             $usuarios[] = $row;
         }
     
-        // Obtener todas las torres (usando el nombre correcto de la columna 'nombre_torre')
-        $queryTorres = "SELECT id, nombre_torre FROM tb_torres";
-        $resultTorres = $conn->query($queryTorres);
-        $torres = [];
-        while ($row = $resultTorres->fetch_assoc()) {
-            $torres[] = $row;
-        }
-    
-        // Obtener todos los apartamentos (usando el nombre correcto de la columna 'numero_apartamento')
-        $queryApartamentos = "SELECT id, numero_apartamento FROM tb_apartamentos";
-        $resultApartamentos = $conn->query($queryApartamentos);
-        $apartamentos = [];
-        while ($row = $resultApartamentos->fetch_assoc()) {
-            $apartamentos[] = $row;
-        }
-    
-        // Pasar los datos a la vista
+        // Pasar los datos de los usuarios a la vista
         require_once __DIR__ . '/../views/usuarios/crear_usuario.php';
     }
     
 
     
     public function crearUsuario() {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         if ($_SESSION['rol'] != 'administrador') {
             header("Location: /PROYECTO_APCR3.0/usuarios/login");
             exit();
@@ -218,21 +213,27 @@ class UsuariosController {
         require_once __DIR__ . '/../views/usuarios/crear_usuario.php';
     }
     
-        
     public function guardarUsuario() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             require_once __DIR__ . '/../../config/database.php';
     
             $correo = $_POST['correo'];
-            $clave = password_hash($_POST['clave'], PASSWORD_DEFAULT);
-            $nombre_completo = $_POST['nombre_completo'];
+            if (empty($_POST['clave']) && empty($numero_documento_original)) {
+                // Si no hay contraseña y es un usuario nuevo, mostrar error
+                header("Location: /PROYECTO_APCR3.0/usuarios/crear?mensaje=La contraseña es obligatoria para un usuario nuevo.");
+                exit();
+            }
+            
+            // Encriptar la contraseña solo si está definida
+            $clave = isset($_POST['clave']) && !empty($_POST['clave']) ? password_hash($_POST['clave'], PASSWORD_DEFAULT) : null;
+                        $nombre_completo = $_POST['nombre_completo'];
             $numero_documento = $_POST['numero_documento'];
             $numero_celular = $_POST['numero_celular'];
             $rol = $_POST['rol'];
             $numero_documento_original = $_POST['numero_documento_original']; // Campo oculto para verificar si es edición
     
-            $torre = NULL;
-            $apartamento = NULL;
+            $torre = null;
+            $apartamento = null;
     
             // Si es residente, obtener torre y apartamento
             if ($rol === 'residente') {
@@ -253,19 +254,6 @@ class UsuariosController {
                     exit();
                 }
     
-                // Verificar si la torre y apartamento ya están ocupados (solo para residentes)
-                if ($rol === 'residente') {
-                    $stmt = $conn->prepare("SELECT * FROM tb_usuarios WHERE id_torre = ? AND id_apartamento = ?");
-                    $stmt->bind_param("ii", $torre, $apartamento);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-    
-                    if ($result->num_rows > 0) {
-                        header("Location: /PROYECTO_APCR3.0/usuarios/crear?mensaje=La torre y apartamento ya están ocupados por otro usuario.");
-                        exit();
-                    }
-                }
-    
                 // Crear el usuario si no hay conflictos
                 $stmt = $conn->prepare("INSERT INTO tb_usuarios (correo, clave, nombre_completo, numero_documento, numero_celular, id_torre, id_apartamento, rol) 
                                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -277,10 +265,8 @@ class UsuariosController {
                     header("Location: /PROYECTO_APCR3.0/usuarios/crear?mensaje=Error al crear el usuario.");
                     exit();
                 }
-    
             } else {
                 // ** Editar un usuario existente **
-                
                 // Si el correo ha cambiado, verificar si ya existe otro usuario con ese correo
                 if ($correo !== $_POST['correo_original']) {
                     $stmt = $conn->prepare("SELECT * FROM tb_usuarios WHERE correo = ?");
@@ -294,22 +280,19 @@ class UsuariosController {
                     }
                 }
     
-                // Si el usuario es residente, verificar que la combinación de torre y apartamento no esté registrada por otro usuario
-                if ($rol === 'residente' && ($torre !== $_POST['torre_original'] || $apartamento !== $_POST['apartamento_original'])) {
-                    $stmt = $conn->prepare("SELECT * FROM tb_usuarios WHERE id_torre = ? AND id_apartamento = ?");
-                    $stmt->bind_param("ii", $torre, $apartamento);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-    
-                    if ($result->num_rows > 0) {
-                        header("Location: /PROYECTO_APCR3.0/usuarios/crear?mensaje=La torre y apartamento ya están ocupados por otro usuario.");
-                        exit();
-                    }
-                }
-    
                 // Actualizar el usuario
-                $stmt = $conn->prepare("UPDATE tb_usuarios SET correo = ?, nombre_completo = ?, numero_documento = ?, numero_celular = ?, rol = ?, id_torre = ?, id_apartamento = ? WHERE numero_documento = ?");
-                $stmt->bind_param("ssssssis", $correo, $nombre_completo, $numero_documento, $numero_celular, $rol, $torre, $apartamento, $numero_documento_original);
+                $query = "UPDATE tb_usuarios SET correo = ?, nombre_completo = ?, numero_documento = ?, numero_celular = ?, rol = ?, id_torre = ?, id_apartamento = ?";
+                if (!empty($clave)) {
+                    $query .= ", clave = ?"; // Solo actualiza la contraseña si se proporciona
+                }
+                $query .= " WHERE numero_documento = ?";
+    
+                $stmt = $conn->prepare($query);
+                if (!empty($clave)) {
+                    $stmt->bind_param("sssssssis", $correo, $nombre_completo, $numero_documento, $numero_celular, $rol, $torre, $apartamento, $clave, $numero_documento_original);
+                } else {
+                    $stmt->bind_param("ssssssis", $correo, $nombre_completo, $numero_documento, $numero_celular, $rol, $torre, $apartamento, $numero_documento_original);
+                }
     
                 if ($stmt->execute()) {
                     header("Location: /PROYECTO_APCR3.0/usuarios/mostrar?mensaje=Usuario actualizado exitosamente");
@@ -321,9 +304,7 @@ class UsuariosController {
             }
         }
     }
-    
-    
-    
+
     
     public function eliminarUsuario() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {

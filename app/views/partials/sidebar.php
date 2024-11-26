@@ -1,3 +1,10 @@
+<?php
+// Iniciar la sesión solo si no está activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$rol = $_SESSION['rol'] ?? null; // Obtener el rol del usuario desde la sesión
+?>
 <div id="sidebar">
     <button class="hamburger-btn" id="toggleSidebar">
         <i class="fas fa-bars"></i>
@@ -18,7 +25,8 @@
         <span>Zonas Comunes</span>
     </a>
 
-    <?php if (isset($_SESSION['rol']) && $_SESSION['rol'] == 'administrador'): ?>
+    <!-- Mostrar solo si el rol es administrador -->
+    <?php if ($rol === 'administrador'): ?>
         <a href="/PROYECTO_APCR3.0/usuarios/mostrar" class="menu-item">
             <i class="fas fa-users-cog"></i>
             <span>Administración de Usuarios</span>

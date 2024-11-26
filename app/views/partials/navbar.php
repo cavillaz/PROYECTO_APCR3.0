@@ -10,9 +10,10 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Icono de perfil del usuario -->
     <a href="#" class="navbar-text text-white mx-2">
       <i class="fas fa-user-circle"></i> <!-- Ícono de perfil -->
+      <span class="navbar-text text-white mx-2"><?= $_SESSION['usuario']; ?></span>
     </a>
     
-    <span class="navbar-text text-white mx-2">Bienvenido, <?= $_SESSION['usuario']; ?></span>
+
     
     <!-- Icono de cerrar sesión -->
     <a href="/PROYECTO_APCR3.0/usuarios/logout" class="navbar-text text-white mx-2">

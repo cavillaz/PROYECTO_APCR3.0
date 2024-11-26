@@ -4,6 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/../partials/auth.php';
+
+
 // Conexión a la base de datos
 require_once __DIR__ . '/../../../config/database.php';
 

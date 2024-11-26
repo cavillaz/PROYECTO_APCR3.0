@@ -1,6 +1,10 @@
 <?php
 class ParqueaderosController {
 
+    public function index() {
+        require_once __DIR__ . '/../views/parqueaderos/parqueaderos.php';
+    }
+    
     // Función para mostrar la página de gestión de parqueadero
     public function gestion() {
         require_once __DIR__ . '/../../config/database.php';

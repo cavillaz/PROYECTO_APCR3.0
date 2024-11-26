@@ -1,3 +1,13 @@
+<?php
+// Solo iniciar la sesión si no hay ninguna activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../partials/auth.php';
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -107,11 +117,12 @@
     let selectedZona = '';
 
     $('.zona-boton').on('click', function () {
-        selectedZona = $(this).data('zona');
-        $('#zona').val(selectedZona);
-        $('.calendar-container').fadeIn();
-        renderCalendar();
-    });
+    selectedZona = $(this).data('zona');
+    $('#zona').val(selectedZona);
+    $('.calendar-container').fadeIn();
+    renderCalendar(); // Muestra el calendario sin validar para la fecha actual
+});
+
 
     // Navegar al mes anterior
     $('#prevMonth').on('click', function () {
@@ -197,13 +208,22 @@
                 }
 
                 const dayElement = $('<div class="calendar-day"></div>')
-                    .append(`<span>${day}</span>`)
-                    .append(`<div class="status-circle ${statusClass}"></div>`);
-                
+                .append(`<span>${day}</span>`)
+                .append(`<div class="status-circle ${statusClass}"></div>`);
+
+            // Bloquear días ocupados y permitir clic solo en días libres o pendientes
+            if (statusClass === 'occupied') {
+                dayElement.addClass('disabled-day'); // Agregar clase para marcar como deshabilitado
+            } else {
                 dayElement.on('click', function () {
                     $('#fechaSolicitud').val(`${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
                     $('#solicitudModal').modal('show');
                 });
+            }
+
+            $('#calendario').append(dayElement);
+
+
                 
                 $('#calendario').append(dayElement);
             }

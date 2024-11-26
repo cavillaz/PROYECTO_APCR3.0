@@ -1,3 +1,12 @@
+<?php
+// Solo iniciar la sesión si no hay ninguna activa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../partials/auth.php';
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -111,6 +120,11 @@
                     <div class="form-group">
                         <label for="numero_celular">Número de Celular</label>
                         <input type="text" class="form-control" id="numero_celular" name="numero_celular" required>
+                    </div>
+                    <div class="form-group">
+                    <div class="form-group">
+                        <label for="clave">Contraseña</label>
+                        <input type="password" class="form-control" id="clave" name="clave" placeholder="Ingrese una contraseña" required>
                     </div>
           <!-- Campo Rol -->
           <div class="form-group">
