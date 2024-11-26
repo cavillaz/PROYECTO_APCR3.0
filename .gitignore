@@ -1,0 +1,17 @@
+# Ignorar todos los archivos con extensión .log
+##*.log
+
+# Ignorar una carpeta específica
+##carpeta_a_ignorar/
+
+# Ignorar todos los archivos temporales
+##*.tmp
+
+# Ignorar configuraciones locales específicas
+##.env
+
+# Ignorar todo en una carpeta, excepto un archivo
+##carpeta/*
+##!carpeta/importante.txt
+
+config/database.php
