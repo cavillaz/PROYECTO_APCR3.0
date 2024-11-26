@@ -14,4 +14,4 @@
 ##carpeta/*
 ##!carpeta/importante.txt
 
-config/database.php
+#config/database.php
