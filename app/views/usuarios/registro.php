@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Incluye Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Incluye el archivo CSS global -->
-    <link rel="stylesheet" href="/PROYECTO_APCR3.0/public/css/styles.css">
+    <link rel="stylesheet" href="../../../public/css/styles.css">
 </head>
 <body>
     <div class="container-fluid">

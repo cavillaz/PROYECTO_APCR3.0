@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/PROYECTO_APCR3.0/public/css/styles.css">
+    <link rel="stylesheet" href="../../../public/css/styles.css">
 
 </head>
 <body>
