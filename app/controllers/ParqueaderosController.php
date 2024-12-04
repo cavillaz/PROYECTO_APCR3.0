@@ -21,68 +21,102 @@ class ParqueaderosController {
     public function solicitar() {
         require_once __DIR__ . '/../../config/database.php';
     
-        $parqueadero_id = $_POST['parqueadero_id'];
-        $nombre_persona = $_POST['nombre_persona'];
-        $documento_persona = $_POST['documento_persona'];
-        $tipo_vehiculo = $_POST['tipo_vehiculo'];
-        $placa_vehiculo = $_POST['placa_vehiculo'];
-        $tipo_parqueadero = $_POST['tipo_parqueadero'];
+        if (isset($_POST['parqueadero_id'], $_POST['nombre_persona'], $_POST['documento_persona'], 
+                  $_POST['tipo_vehiculo'], $_POST['placa_vehiculo'], $_POST['tipo_parqueadero'])) {
     
-        // Verificar si el parqueadero ya está reservado
-        $checkQuery = "SELECT * FROM tb_historial_parqueaderos 
-                       WHERE (documento_persona = ? OR placa_vehiculo = ?) 
-                       AND estado IN ('pendiente_aprobacion', 'ocupado')";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("ss", $documento_persona, $placa_vehiculo);
-        $checkStmt->execute();
-        $checkResult = $checkStmt->get_result();
+            $parqueadero_id = (int) $_POST['parqueadero_id'];
+            $nombre_persona = $_POST['nombre_persona'];
+            $documento_persona = $_POST['documento_persona'];
+            $tipo_vehiculo = $_POST['tipo_vehiculo'];
+            $placa_vehiculo = $_POST['placa_vehiculo'];
+            $tipo_parqueadero = $_POST['tipo_parqueadero'];
     
-        if ($checkResult->num_rows > 0) {
-            header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=Error: Ya tienes un parqueadero reservado o pendiente de aprobación&tipo=error");
-            exit();
-        }
+            // Registrar la fecha actual en formato adecuado
+            $fecha_solicitud = date("Y-m-d H:i:s");
     
-        $query = "INSERT INTO tb_historial_parqueaderos 
-                  (parqueadero_id, nombre_persona, documento_persona, tipo_vehiculo, placa_vehiculo, tipo_parqueadero, fecha_solicitud, estado) 
-                  VALUES (?, ?, ?, ?, ?, ?, NOW(), 'pendiente_aprobacion')";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("isssss", $parqueadero_id, $nombre_persona, $documento_persona, $tipo_vehiculo, $placa_vehiculo, $tipo_parqueadero);
+            // Verificar si el parqueadero ya está ocupado
+            $queryEstado = "SELECT estado FROM tb_parqueaderos WHERE id = ?";
+            $stmtEstado = $conn->prepare($queryEstado);
+            $stmtEstado->bind_param('i', $parqueadero_id);
+            $stmtEstado->execute();
+            $resultEstado = $stmtEstado->get_result();
+            $estado = $resultEstado->fetch_assoc()['estado'];
     
-        if ($stmt->execute()) {
-            $updateQuery = "UPDATE tb_parqueaderos SET estado = 'pendiente_aprobacion' WHERE id = ?";
-            $updateStmt = $conn->prepare($updateQuery);
-            $updateStmt->bind_param("i", $parqueadero_id);
-            $updateStmt->execute();
+            if ($estado === 'ocupado') {
+                header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=" . urlencode("El parqueadero ya está ocupado.") . "&tipo=error");
+                exit;
+            }
     
-            header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=Parqueadero reservado correctamente&tipo=success");
+            // Validar que no exista la misma placa o documento en una solicitud activa
+            $queryValidacion = "SELECT * FROM tb_historial_parqueaderos WHERE (placa_vehiculo = ? OR documento_persona = ?) AND estado IN ('pendiente_aprobacion', 'ocupado')";
+            $stmtValidacion = $conn->prepare($queryValidacion);
+            $stmtValidacion->bind_param('ss', $placa_vehiculo, $documento_persona);
+            $stmtValidacion->execute();
+            $resultValidacion = $stmtValidacion->get_result();
+    
+            if ($resultValidacion->num_rows > 0) {
+                header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=" . urlencode("Ya existe una solicitud activa con la misma placa o documento.") . "&tipo=error");
+                exit;
+            }
+    
+            // Insertar en el historial de parqueaderos
+            $query = "INSERT INTO tb_historial_parqueaderos (parqueadero_id, nombre_persona, documento_persona, tipo_vehiculo, placa_vehiculo, tipo_parqueadero, estado, fecha_solicitud) 
+                      VALUES (?, ?, ?, ?, ?, ?, 'pendiente_aprobacion', ?)";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param('issssss', $parqueadero_id, $nombre_persona, $documento_persona, $tipo_vehiculo, $placa_vehiculo, $tipo_parqueadero, $fecha_solicitud);
+    
+            if ($stmt->execute()) {
+                // Actualizar el estado del parqueadero
+                $queryActualizar = "UPDATE tb_parqueaderos SET estado = 'pendiente_aprobacion' WHERE id = ?";
+                $stmtActualizar = $conn->prepare($queryActualizar);
+                $stmtActualizar->bind_param('i', $parqueadero_id);
+                $stmtActualizar->execute();
+    
+                header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=" . urlencode("Solicitud registrada con éxito.") . "&tipo=success");
+            } else {
+                header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=" . urlencode("Error al registrar la solicitud.") . "&tipo=error");
+            }
         } else {
-            header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=Error al reservar el parqueadero&tipo=error");
+            header("Location: /PROYECTO_APCR3.0/parqueaderos/gestion?mensaje=" . urlencode("Faltan datos para procesar la solicitud.") . "&tipo=error");
         }
     }
     
-
     
-    
+        
     public function obtenerDatosParqueadero($parqueadero_id) {
         // Conexión a la base de datos
         require_once __DIR__ . '/../../config/database.php';
     
-        // Consulta para obtener los datos del parqueadero
-        $query = "SELECT h.nombre_persona, h.documento_persona, h.tipo_vehiculo, h.placa_vehiculo, 
-                         h.tipo_parqueadero, h.pago, h.estado
-                  FROM tb_historial_parqueaderos h
-                  WHERE h.parqueadero_id = ? AND h.estado IN ('pendiente_aprobacion', 'ocupado')";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param('i', $parqueadero_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        // Consulta para verificar si el parqueadero está ocupado o pendiente de aprobación
+        $queryHistorial = "SELECT h.nombre_persona, h.documento_persona, h.tipo_vehiculo, h.placa_vehiculo, 
+                                  h.tipo_parqueadero, h.pago, h.estado
+                           FROM tb_historial_parqueaderos h
+                           WHERE h.parqueadero_id = ? AND h.estado IN ('pendiente_aprobacion', 'ocupado')";
+        $stmtHistorial = $conn->prepare($queryHistorial);
+        $stmtHistorial->bind_param('i', $parqueadero_id);
+        $stmtHistorial->execute();
+        $resultHistorial = $stmtHistorial->get_result();
     
-        if ($result->num_rows > 0) {
-            return $result->fetch_assoc();  // Retornar los datos si existe un parqueadero pendiente o ocupado
+        if ($resultHistorial->num_rows > 0) {
+            return $resultHistorial->fetch_assoc();  // Retorna los datos si el parqueadero está ocupado o pendiente
         } else {
-            return null;  // Retornar null si el parqueadero está libre
+            // Si no hay registros en el historial, obtener los datos básicos del parqueadero
+            $queryParqueadero = "SELECT id, numero_parqueadero, nombre_parqueadero, 'libre' AS estado 
+                                 FROM tb_parqueaderos
+                                 WHERE id = ?";
+            $stmtParqueadero = $conn->prepare($queryParqueadero);
+            $stmtParqueadero->bind_param('i', $parqueadero_id);
+            $stmtParqueadero->execute();
+            $resultParqueadero = $stmtParqueadero->get_result();
+    
+            if ($resultParqueadero->num_rows > 0) {
+                return $resultParqueadero->fetch_assoc();  // Retorna los datos del parqueadero libre
+            } else {
+                return null;  // Si no existe el parqueadero
+            }
         }
     }
+    
     
 
     // Función para liberar un parqueadero (opcional, si quieres manejar la liberación)

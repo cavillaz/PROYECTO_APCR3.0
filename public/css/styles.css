@@ -512,3 +512,239 @@ h1 {
                 justify-content: center;
             }
 }
+
+/* Botones de Parqueaderos */
+.parking-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    height: 100px; /* Altura uniforme para los botones */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estados de Parqueaderos */
+.parking-button.libre {
+    background-color: #28a745; /* Verde para libre */
+}
+
+.parking-button.pendiente {
+    background-color: #ffc107; /* Amarillo para pendiente */
+}
+
+.parking-button.ocupado {
+    background-color: #dc3545; /* Rojo para ocupado */
+}
+
+/* Hover Effects */
+.parking-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.parking-button i {
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .parking-button {
+        font-size: 16px;
+        height: auto;
+        padding: 10px;
+    }
+
+    .parking-button i {
+        font-size: 20px;
+    }
+}
+
+/* Contenedor del Calendario */
+.calendar-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Navegación del Mes */
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#calendarTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Encabezado de los Días de la Semana */
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+/* Días del Calendario */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.calendar-day {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    height: 80px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.calendar-day span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.calendar-day:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estado de los Días */
+.status-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-top: 10px;
+}
+
+/* Clases de Estado */
+.status-circle.free {
+    background-color: #28a745; /* Verde para días libres */
+}
+
+.status-circle.pending {
+    background-color: #ffc107; /* Amarillo para días pendientes */
+}
+
+.status-circle.occupied {
+    background-color: #dc3545; /* Rojo para días ocupados */
+}
+
+/* Días deshabilitados */
+.calendar-day.disabled-day {
+    background-color: #f8d7da;
+    color: #721c24;
+    cursor: not-allowed;
+}
+
+.calendar-day.disabled-day span {
+    color: #721c24;
+}
+
+/* Botones */
+.btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .calendar-day {
+        height: 60px;
+        font-size: 0.9rem;
+    }
+
+    .calendar-day span {
+        font-size: 1rem;
+    }
+
+    .status-circle {
+        width: 15px;
+        height: 15px;
+    }
+}
+
+/* Botones de Selección de Zona */
+.zona-boton {
+    background: linear-gradient(to right, #007bff, #6610f2); /* Degradado atractivo */
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 15px 25px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    margin: 10px;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.zona-boton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to right, #0056b3, #520dc2); /* Degradado más oscuro */
+}
+
+.zona-boton:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsividad para los Botones */
+@media (max-width: 768px) {
+    .zona-boton {
+        font-size: 1rem;
+        padding: 10px 20px;
+        width: 100%; /* Botones apilados en pantallas pequeñas */
+    }
+}
+
+.parking-button.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.modal {
+    display: none; /* Bootstrap maneja esto automáticamente */
+    z-index: 1050; /* Valor predeterminado para que el modal aparezca en primer plano */
+    position: fixed; /* El modal debe estar en una posición fija */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+}
+.modal.show {
+    display: block; /* Se asegura de que el modal sea visible */
+}

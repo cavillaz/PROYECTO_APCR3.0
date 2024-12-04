@@ -36,7 +36,7 @@
                 <?php endif; ?>
 
                 <!-- Aprobación de Zonas -->
-                <?php if ($rol === 'administrador' || $rol === 'porteria'): ?>
+                <?php if ($rol === 'administrador'): ?>
                     <div class="col-md-4 mb-4">
                         <a href="/PROYECTO_APCR3.0/zonas_comunes/aprobacion" class="zona-card text-center">
                             <i class="fas fa-check-circle"></i>

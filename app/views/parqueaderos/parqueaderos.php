@@ -18,39 +18,44 @@
         <?php require_once __DIR__ . '/../partials/navbar.php'; ?>
 
 
-
         <div class="container mt-5">
-            <div class="text-center">
-                <h1 class="mb-4 text-primary">Módulo de Parqueaderos</h1>
-                <p class="lead">Gestione y administre los parqueaderos de forma sencilla y organizada.</p>
+    <div class="text-center">
+        <h1 class="mb-4 text-primary">Módulo de Parqueaderos</h1>
+        <p class="lead">Gestione y administre los parqueaderos de forma sencilla y organizada.</p>
+    </div>
+
+    <div class="row text-center">
+        <!-- Gestión de Parqueadero -->
+        <?php if ($_SESSION['rol'] === 'residente' || $_SESSION['rol'] === 'porteria' || $_SESSION['rol'] === 'administrador'): ?>
+            <div class="col-md-4">
+                <a href="/PROYECTO_APCR3.0/parqueaderos/gestion" class="parking-card bg-primary">
+                    <i class="fas fa-car"></i>
+                    <h5>Gestión de Parqueadero</h5>
+                </a>
             </div>
+        <?php endif; ?>
 
-                <div class="row text-center">
-                    <!-- Gestión de Parqueadero -->
-                    <div class="col-md-4">
-                        <a href="/PROYECTO_APCR3.0/parqueaderos/gestion" class="parking-card bg-primary">
-                            <i class="fas fa-car"></i>
-                            <h5>Gestión de Parqueadero</h5>
-                        </a>
-                    </div>
-
-                    <!-- Aprobación de Parqueadero -->
-                    <div class="col-md-4">
-                        <a href="/PROYECTO_APCR3.0/parqueaderos/aprobacion" class="parking-card bg-primary">
-                            <i class="fas fa-check-circle"></i>
-                            <h5>Aprobación de Parqueadero</h5>
-                        </a>
-                    </div>
-
-                    <!-- Historial de Parqueaderos -->
-                    <div class="col-md-4">
-                        <a href="/PROYECTO_APCR3.0/parqueaderos/historial" class="parking-card bg-primary">
-                            <i class="fas fa-history"></i>
-                            <h5>Historial de Parqueaderos</h5>
-                        </a>
-                    </div>
-                </div>
+        <!-- Aprobación de Parqueadero -->
+        <?php if ($_SESSION['rol'] === 'porteria' || $_SESSION['rol'] === 'administrador'): ?>
+            <div class="col-md-4">
+                <a href="/PROYECTO_APCR3.0/parqueaderos/aprobacion" class="parking-card bg-primary">
+                    <i class="fas fa-check-circle"></i>
+                    <h5>Aprobación de Parqueadero</h5>
+                </a>
             </div>
+        <?php endif; ?>
+
+        <!-- Historial de Parqueaderos -->
+        <?php if ($_SESSION['rol'] === 'porteria' || $_SESSION['rol'] === 'administrador'): ?>
+            <div class="col-md-4">
+                <a href="/PROYECTO_APCR3.0/parqueaderos/historial" class="parking-card bg-primary">
+                    <i class="fas fa-history"></i>
+                    <h5>Historial de Parqueaderos</h5>
+                </a>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
 
 
     <!-- Scripts -->

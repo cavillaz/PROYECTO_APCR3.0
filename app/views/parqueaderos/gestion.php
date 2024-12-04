@@ -63,9 +63,10 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
         <?php endif; ?>
 
         <div class="row">
-        <?php foreach ($parqueaderos as $parqueadero): 
+    <?php foreach ($parqueaderos as $parqueadero): 
         // Determinar la clase CSS basada en el estado del parqueadero
         $claseEstado = '';
+        $disabled = ''; // Por defecto, el botón estará habilitado
         switch ($parqueadero['estado']) {
             case 'libre':
                 $claseEstado = 'libre';
@@ -75,6 +76,7 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
                 break;
             case 'ocupado':
                 $claseEstado = 'ocupado';
+                $disabled = 'disabled'; // Deshabilitar el botón si está ocupado
                 break;
             default:
                 $claseEstado = 'libre'; // Default para evitar errores
@@ -82,7 +84,8 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
         }
     ?>
         <div class="col-md-3 mb-4">
-            <button class="btn parking-button <?= $claseEstado ?>" data-toggle="modal" data-target="#modalParqueadero" 
+            <button class="btn parking-button <?= $claseEstado ?>" <?= $disabled ?> 
+                data-toggle="modal" data-target="#modalParqueadero" 
                 data-id="<?= $parqueadero['id']; ?>" 
                 data-numero="<?= $parqueadero['numero_parqueadero']; ?>"
                 data-nombre="<?= $parqueadero['nombre_parqueadero']; ?>">
@@ -91,6 +94,7 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
         </div>
     <?php endforeach; ?>
 </div>
+
 
 
 <!-- Modal para solicitar parqueadero -->
@@ -104,8 +108,8 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
                 </button>
             </div>
             <div class="modal-body">
-                <form id="formSolicitudParqueadero" action="/PROYECTO_APCR3.0/parqueaderos/solicitar" method="POST">
-                    <input type="hidden" id="parqueadero_id" name="parqueadero_id">
+            <form id="formSolicitudParqueadero" action="/PROYECTO_APCR3.0/parqueaderos/solicitar" method="POST">
+                <input type="hidden" id="parqueadero_id" name="parqueadero_id">
                     <div class="form-group">
                         <label for="nombre_persona">Nombre de la persona</label>
                         <input type="text" class="form-control" id="nombre_persona" name="nombre_persona" required>
@@ -147,49 +151,12 @@ $parqueaderos = $result->fetch_all(MYSQLI_ASSOC);
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        $('#modalParqueadero').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Botón que abrió el modal
-            var id = button.data('id'); // Obtener el ID del parqueadero
-            var modal = $(this);
+$('#modalParqueadero').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget); // Botón que abrió el modal
+    const parqueadero_id = button.data('id'); // Obtener el ID del parqueadero
+    $('#parqueadero_id').val(parqueadero_id); // Asignar al campo oculto
+});
 
-            // Hacer una solicitud AJAX para obtener los datos del parqueadero
-            $.ajax({
-                url: '/PROYECTO_APCR3.0/parqueaderos/obtenerDatosParqueadero',
-                type: 'POST',
-                data: { parqueadero_id: id },
-                success: function(response) {
-                    var data = JSON.parse(response);
-
-                    if (data) {
-                        // Si el parqueadero está ocupado o pendiente de aprobación, mostrar los datos y deshabilitar los campos
-                        modal.find('#nombre_persona').val(data.nombre_persona).prop('disabled', true);
-                        modal.find('#documento_persona').val(data.documento_persona).prop('disabled', true);
-                        modal.find('#tipo_vehiculo').val(data.tipo_vehiculo).prop('disabled', true);
-                        modal.find('#placa_vehiculo').val(data.placa_vehiculo).prop('disabled', true);
-                        modal.find('#tipo_parqueadero').val(data.tipo_parqueadero).prop('disabled', true);
-                        modal.find('#pago').val(data.pago).prop('disabled', true);
-
-                        // Mostrar mensaje de estado y ocultar botón de reservar
-                        modal.find('#estadoMensaje').text('El parqueadero está en estado ' + data.estado).show();
-                        modal.find('#reservarBtn').hide();
-                    } else {
-                        // Si está libre, habilitar los campos para la reserva
-                        modal.find('#nombre_persona, #documento_persona, #tipo_vehiculo, #placa_vehiculo, #tipo_parqueadero, #pago').val('').prop('disabled', false);
-                        modal.find('#estadoMensaje').hide();
-                        modal.find('#reservarBtn').show();
-
-                        // Cambiar el título del modal
-                        modal.find('.modal-title').text('Reservar Parqueadero ' + id);
-                    }
-
-                    // Rellenar el ID del parqueadero en el campo oculto
-                    modal.find('#parqueadero_id').val(id);
-                },
-                error: function() {
-                    alert('Error al obtener los datos del parqueadero.');
-                }
-            });
-        });
 
 
 

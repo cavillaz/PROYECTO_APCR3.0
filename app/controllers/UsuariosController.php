@@ -174,27 +174,10 @@ class UsuariosController {
     }
     
 
-    
     public function crearUsuario() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        if ($_SESSION['rol'] != 'administrador') {
-            header("Location: /PROYECTO_APCR3.0/usuarios/login");
-            exit();
-        }
-    
         require_once __DIR__ . '/../../config/database.php';
     
-        // Obtener todos los usuarios registrados
-        $queryUsuarios = "SELECT correo, numero_documento, nombre_completo, rol FROM tb_usuarios";
-        $resultUsuarios = $conn->query($queryUsuarios);
-        $usuarios = [];
-        while ($row = $resultUsuarios->fetch_assoc()) {
-            $usuarios[] = $row;
-        }
-    
-        // Obtener todas las torres y apartamentos como antes
+        // Obtener todas las torres
         $queryTorres = "SELECT id, nombre_torre FROM tb_torres";
         $resultTorres = $conn->query($queryTorres);
         $torres = [];
@@ -202,6 +185,7 @@ class UsuariosController {
             $torres[] = $row;
         }
     
+        // Obtener todos los apartamentos
         $queryApartamentos = "SELECT id, numero_apartamento FROM tb_apartamentos";
         $resultApartamentos = $conn->query($queryApartamentos);
         $apartamentos = [];
@@ -209,9 +193,10 @@ class UsuariosController {
             $apartamentos[] = $row;
         }
     
-        // Asegúrate de pasar los usuarios, torres y apartamentos a la vista
+        // Pasar las variables a la vista
         require_once __DIR__ . '/../views/usuarios/crear_usuario.php';
     }
+    
     
     public function guardarUsuario() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -305,28 +290,24 @@ class UsuariosController {
         }
     }
 
-    
     public function eliminarUsuario() {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once __DIR__ . '/../../config/database.php';
     
-            // Recibir el ID del usuario enviado desde el AJAX
-            $idUsuario = $_POST['id'];
+            $numero_documento = $_POST['id'];
     
-            // Preparar la consulta para eliminar el usuario por número de documento
+            // Consulta para eliminar al usuario
             $stmt = $conn->prepare("DELETE FROM tb_usuarios WHERE numero_documento = ?");
-            $stmt->bind_param("s", $idUsuario);
+            $stmt->bind_param("s", $numero_documento);
     
             if ($stmt->execute()) {
-                // Responder con éxito en formato JSON
-                echo json_encode(['success' => true, 'message' => 'Usuario eliminado exitosamente']);
+                echo json_encode(['success' => true, 'message' => 'Usuario eliminado exitosamente.']);
             } else {
-                // Responder con un error en formato JSON
-                echo json_encode(['success' => false, 'message' => 'Error al eliminar el usuario']);
+                echo json_encode(['success' => false, 'message' => 'Error al eliminar el usuario.']);
             }
-            exit(); // Terminar la ejecución del script
         }
     }
+    
     
     public function obtenerUsuario() {
         require_once __DIR__ . '/../../config/database.php';

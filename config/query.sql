@@ -1,6 +1,6 @@
-CREATE DATABASE proyecto_mvc;
+CREATE DATABASE base_apcr;
 
-USE proyecto_mvc;
+USE base_apcr;
 
 
 CREATE TABLE tb_torres (
