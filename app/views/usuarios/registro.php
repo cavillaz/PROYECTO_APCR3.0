@@ -20,7 +20,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="container-fluid">
         <div class="row no-gutters">
             <!-- Parte izquierda: Imagen (solo se mostrará en pantallas medianas y grandes) -->
-            <div class="col-md-6 image-container" style="background-image: url('/PROYECTO_APCR3.0/public/images/logoapcr.png');"></div>
+            <div class="col-md-6 image-container" style="background-image: url('../../../public/images/logoapcr.png');"></div>
 
             <!-- Parte derecha: Formulario (siempre visible) -->
             <div class="col-lg-6 col-md-12 form-container">

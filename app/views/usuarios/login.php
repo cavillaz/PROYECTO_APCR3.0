@@ -12,7 +12,7 @@
     <div class="container-fluid">
         <div class="row no-gutters">
             <!-- Lado de la imagen -->
-            <div class="col-md-6 image-container" style="background-image: url('/PROYECTO_APCR3.0/public/images/logoapcr.png');"></div>
+            <div class="col-md-6 image-container" style="background-image: url('../../../public/images/logoapcr.png');"></div>
             
             <!-- Lado del formulario -->
             <div class="col-md-6 form-container">
