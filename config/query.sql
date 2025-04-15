@@ -210,9 +210,9 @@ CREATE TABLE tb_zonas_comunes (
 -- Insertar un usuario administrador en la tabla tb_usuarios
 INSERT INTO tb_usuarios (correo, clave, nombre_completo, numero_documento, numero_celular, rol, id_torre, id_apartamento)
 VALUES (
-    'camilo.ovalle@outlook.es', 
+    'andresvillaz@gmail.com', 
     '$2y$10$s3n8fe4ePDCv03NFgUkRSuJnyGPFj3ylLahLu8IM82T0ZLIaV2fRm',
-    'Juan Camilo Ovalle Cardenas', 
+    'Camilo Andres Villa', 
     '1023959791', 
     '3508596818', 
     'administrador', 
