@@ -1,8 +1,8 @@
 <?php
-$host = '10.128.0.3';
+$host = 'mysql-apcr';
 $usuario = 'apcr';
 $password = 'root';
-$base_datos = 'proyecto_mvc';
+$base_datos = 'base_apcr';
 $puerto = 3306;
 
 

@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-apcr
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: base_apcr
+      MYSQL_USER: apcr
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./config/query.sql:/docker-entrypoint-initdb.d/query.sql
+    networks:
+      - apcr_network
+  php-apache:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: php_apache_apcr
+    ports:
+      - "8080:80"  # Acceso a la web en el puerto 8080
+    volumes:
+      - .:/var/www/html  # Monta tu proyecto en la carpeta de Apache
+    networks:
+      - apcr_network      
+
+volumes:
+  mysql_data:
+
+networks:
+  apcr_network:

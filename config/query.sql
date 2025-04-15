@@ -1,6 +1,6 @@
-CREATE DATABASE base_apcr;
+-- CREATE DATABASE base_apcr;
 
-USE base_apcr;
+-- USE base_apcr;
 
 
 CREATE TABLE tb_torres (
@@ -220,6 +220,11 @@ VALUES (
     2 
 );
 
+-- Crear usuario apcr con privilegios
+CREATE DATABASE IF NOT EXISTS base_apcr;
+CREATE USER IF NOT EXISTS 'apcr'@'%' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON base_apcr.* TO 'apcr'@'%';
+FLUSH PRIVILEGES;
 
 SELECT * FROM tb_parqueaderos;
 SELECT * FROM tb_zonas_comunes;
