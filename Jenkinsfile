@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clonar repositorio') {
             steps {
-                git 'https://github.com/cavillaz/PROYECTO_APCR3.0.git'
+                git branch: 'main', url: 'https://github.com/cavillaz/PROYECTO_APCR3.0.git'
             }
         }
 
