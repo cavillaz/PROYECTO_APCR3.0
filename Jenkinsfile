@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clonar repositorio') {
+            steps {
+                git 'https://github.com/cavillaz/PROYECTO_APCR3.0.git'
+            }
+        }
+
+        stage('Construir contenedor') {
+            steps {
+                script {
+                    sh 'docker build -t proyecto_apcr .'
+                }
+            }
+        }
+
+        stage('Levantar con Docker Compose') {
+            steps {
+                script {
+                    sh 'docker-compose up -d --build'
+                }
+            }
+        }
+    }
+}
