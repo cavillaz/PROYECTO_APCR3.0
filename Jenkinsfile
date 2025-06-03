@@ -11,7 +11,7 @@ pipeline {
         stage('Construir contenedor') {
             steps {
                 script {
-                    sh 'docker build -t proyecto_apcr .'
+                    sh 'docker build .'
                 }
             }
         }
@@ -19,7 +19,7 @@ pipeline {
         stage('Levantar con Docker Compose') {
             steps {
                 script {
-                    sh 'docker-compose up -d --build'
+                    sh 'docker-compose up -d'
                 }
             }
         }
