@@ -4,6 +4,7 @@ pipeline {
     stages {
         stage('Clonar repositorio') {
             steps {
+                deleteDir() // limpia el workspace
                 git branch: 'main', url: 'https://github.com/cavillaz/PROYECTO_APCR3.0.git'
             }
         }
